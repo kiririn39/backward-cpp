@@ -33,10 +33,24 @@
 // - g++/clang++ -lunwind
 // #define BACKWARD_HAS_LIBUNWIND 1
 
+#include "backward.h"
+
 #include "backward.hpp"
 
-namespace backward {
+std::ostringstream Backward::GetStackTrace() {
+  backward::TraceResolver resolver;
+  static backward::SignalHandling sh;
 
-backward::SignalHandling sh;
+  backward::StackTrace stackTrace;
+  stackTrace.load_here(32);
 
-} // namespace backward
+  backward::Printer printer;
+  printer.object = true;
+  printer.color_mode = backward::ColorMode::always;
+  printer.address = true;
+
+  std::ostringstream stream;
+  printer.print(stackTrace, stream);
+
+  return stream;
+}
